@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Masked Society — Get Your Pass</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --gold: #C9A84C; --gold-light: #E8C97A; --black: #0A0A0A; --dark2: #1A1A1A; --dark3: #222222; --white: #F5F0E8; --muted: #888880; --border: rgba(201,168,76,0.2); }
@@ -61,8 +60,6 @@
   .code-box { background: var(--black); border: 1px solid var(--gold); border-radius: 2px; padding: 2rem; text-align: center; margin: 1.5rem 0; }
   .code-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
   .code-value { font-family: "Cormorant Garamond", serif; font-size: 36px; font-weight: 300; letter-spacing: 6px; color: var(--gold); }
-  .qr-wrap { display: flex; justify-content: center; margin: 1.5rem 0; }
-  .qr-wrap canvas { border: 4px solid var(--white); border-radius: 4px; }
   .screenshot-note { font-size: 11px; color: var(--muted); text-align: center; letter-spacing: 0.5px; margin-top: 0.75rem; line-height: 1.6; }
   .spinner { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 11px; letter-spacing: 2px; display: none; }
 </style>
@@ -88,7 +85,7 @@
     <div class="step-seg" id="seg4"></div>
   </div>
 
-  <!-- STEP 1: Details -->
+  <!-- STEP 1 -->
   <div class="step active" id="step1">
     <div class="card">
       <div class="card-title">Your details</div>
@@ -128,12 +125,11 @@
     </div>
   </div>
 
-  <!-- STEP 2: Identity + Payment SS -->
+  <!-- STEP 2 -->
   <div class="step" id="step2">
     <div class="card">
-      <div class="card-title">Identity &amp; payment verification</div>
-      <div class="notice-box"><strong>Required:</strong> Upload your selfie, Aadhaar card, and payment screenshot. All 3 will be shown to gatekeeper at entry.</div>
-
+      <div class="card-title">Identity verification</div>
+      <div class="notice-box"><strong>Required:</strong> Upload your selfie and Aadhaar card for identity verification at the gate.</div>
       <div class="field">
         <label>Your Selfie</label>
         <div class="upload-box">
@@ -145,7 +141,6 @@
         <div class="upload-done" id="selfie-done">&#10003; Selfie uploaded</div>
         <div class="err" id="err-selfie">Please upload your selfie</div>
       </div>
-
       <div class="field">
         <label>Aadhaar Card</label>
         <div class="upload-box">
@@ -157,13 +152,12 @@
         <div class="upload-done" id="aadhaar-done">&#10003; Aadhaar uploaded</div>
         <div class="err" id="err-aadhaar">Please upload your Aadhaar</div>
       </div>
-
       <button class="btn" onclick="goToStep3()">Continue to payment &rarr;</button>
       <button class="btn-ghost" onclick="goToStep1()">Go back</button>
     </div>
   </div>
 
-  <!-- STEP 3: Payment -->
+  <!-- STEP 3 -->
   <div class="step" id="step3">
     <div class="card">
       <div class="card-title">Booking summary</div>
@@ -181,8 +175,7 @@
         <div class="amount-big" id="upi-amount">&#8377;2,499</div>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:1px;">EXACT AMOUNT ONLY</div>
       </div>
-      <div class="notice-box"><strong>After paying:</strong> Take a screenshot of your payment confirmation and upload it below.</div>
-
+      <div class="notice-box"><strong>After paying:</strong> Upload a screenshot of your payment confirmation below.</div>
       <div class="field">
         <label>Payment Screenshot</label>
         <div class="upload-box">
@@ -194,25 +187,23 @@
         <div class="upload-done" id="payment-done">&#10003; Screenshot uploaded</div>
         <div class="err" id="err-payment">Please upload payment screenshot</div>
       </div>
-
-      <div class="spinner" id="spinner">Generating your pass... please wait</div>
+      <div class="spinner" id="spinner">Saving your booking... please wait &#128336;</div>
       <button class="btn" id="confirm-btn" onclick="goToStep4()">Confirm booking &rarr;</button>
-      <button class="btn-ghost" onclick="goToStep2()">Go back</button>
+      <button class="btn-ghost" id="back-btn" onclick="goToStep2()">Go back</button>
     </div>
   </div>
 
-  <!-- STEP 4: Confirmation -->
+  <!-- STEP 4 -->
   <div class="step" id="step4">
     <div class="card" style="text-align:center;padding:2rem 1.5rem;">
       <div class="success-icon">&#10003;</div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:2px;margin-bottom:8px;">You're in.</div>
-      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Show QR code at the gate on 12 June</div>
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Show this code at the gate on 12 June</div>
       <div class="code-box">
         <div class="code-label">Your entry code</div>
         <div class="code-value" id="entry-code">&mdash;</div>
       </div>
-      <div class="qr-wrap" id="qr-container"></div>
-      <div class="screenshot-note">&#128247; Screenshot this QR code and save it.<br>Show at the gate on 12 June.<br>Venue dropping 1 June for ticket holders.</div>
+      <div class="screenshot-note">&#128247; Screenshot your entry code and save it.<br>Show it at the gate on 12 June.<br>Venue dropping 1 June for ticket holders.</div>
       <div style="margin-top:2rem;text-align:left;">
         <div class="summary-row"><span class="lbl">Date</span><span class="val">12 June 2026</span></div>
         <div class="summary-row"><span class="lbl">Name</span><span class="val" id="conf-name">&mdash;</span></div>
@@ -227,8 +218,7 @@
 <script>
 const UPI = "vanshgupta0004-1@oksbi";
 const PER = 2499;
-const GUEST_PAGE = "https://vansh313.github.io/tms-party/tms_guest.html";
-
+const SCRIPT = "https://script.google.com/macros/s/AKfycbw9JPdvo-wQ6gJy2h40MX6A6kFm3DX91G3WcHzIXV8xxakaRB0H7jBcuP08wjcH6W3v/exec";
 let imgs = { selfie: null, aadhaar: null, payment: null };
 
 function goToStep1() { showStep(1); }
@@ -264,11 +254,12 @@ function goToStep3() {
   showStep(3);
 }
 
-function goToStep4() {
+async function goToStep4() {
   document.getElementById("err-payment").style.display = "none";
   if (!imgs.payment) { document.getElementById("err-payment").style.display = "block"; return; }
 
   document.getElementById("confirm-btn").style.display = "none";
+  document.getElementById("back-btn").style.display = "none";
   document.getElementById("spinner").style.display = "block";
 
   const name = document.getElementById("fname").value.trim();
@@ -279,53 +270,51 @@ function goToStep4() {
   const num = Math.floor(1000 + Math.random() * 9000);
   const code = "TMS" + initials + num;
 
-  // Compress all 3 images in sequence
-  compress(imgs.selfie, function(s) {
-    compress(imgs.aadhaar, function(a) {
-      compress(imgs.payment, function(p) {
-        const payload = { code, name, phone, age, tickets: t, selfie: s, aadhaar: a, payment: p };
-        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-        const guestLink = GUEST_PAGE + "#" + encoded;
+  // Compress images
+  const selfieC = await compressImg(imgs.selfie, 200);
+  const aadhaarC = await compressImg(imgs.aadhaar, 200);
+  const paymentC = await compressImg(imgs.payment, 200);
 
-        document.getElementById("entry-code").textContent = code;
-        document.getElementById("conf-name").textContent = name;
-        document.getElementById("conf-phone").textContent = phone;
-        document.getElementById("conf-tickets").textContent = t + (t===1?" ticket":" tickets");
+  const payload = { code, name, phone, age, tickets: t, selfie: selfieC, aadhaar: aadhaarC, payment: paymentC };
 
-        document.getElementById("qr-container").innerHTML = "";
-        new QRCode(document.getElementById("qr-container"), {
-          text: guestLink, width: 200, height: 200,
-          colorDark: "#000000", colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.L
-        });
-
-        document.getElementById("spinner").style.display = "none";
-        showStep(4);
-      });
+  try {
+    await fetch(SCRIPT, {
+      method: "POST",
+      body: JSON.stringify(payload)
     });
-  });
+  } catch(e) {}
+
+  document.getElementById("entry-code").textContent = code;
+  document.getElementById("conf-name").textContent = name;
+  document.getElementById("conf-phone").textContent = phone;
+  document.getElementById("conf-tickets").textContent = t + (t===1?" ticket":" tickets");
+  document.getElementById("spinner").style.display = "none";
+  showStep(4);
 }
 
-function compress(dataUrl, cb) {
-  const img = new Image();
-  img.onload = function() {
-    const canvas = document.createElement("canvas");
-    canvas.width = 80; canvas.height = 80;
-    canvas.getContext("2d").drawImage(img, 0, 0, 80, 80);
-    cb(canvas.toDataURL("image/jpeg", 0.15));
-  };
-  img.src = dataUrl;
+function compressImg(dataUrl, maxW) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", 0.4));
+    };
+    img.src = dataUrl;
+  });
 }
 
 function handleUpload(input, previewId, doneId, key) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = e => {
     imgs[key] = e.target.result;
-    const preview = document.getElementById(previewId);
-    preview.src = e.target.result;
-    preview.style.display = "block";
+    document.getElementById(previewId).src = e.target.result;
+    document.getElementById(previewId).style.display = "block";
     document.getElementById(doneId).style.display = "block";
   };
   reader.readAsDataURL(file);
@@ -334,7 +323,7 @@ function handleUpload(input, previewId, doneId, key) {
 function showStep(n) {
   document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
   document.getElementById("step" + n).classList.add("active");
-  document.querySelectorAll(".step-seg").forEach((s,i) => { s.classList.toggle("done", i < n); });
+  document.querySelectorAll(".step-seg").forEach((s,i) => s.classList.toggle("done", i < n));
   window.scrollTo(0, 0);
 }
 

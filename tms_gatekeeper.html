@@ -169,6 +169,7 @@ function showResult(valid, data, status) {
     if (data.phone) html += row("Phone", data.phone);
     if (data.age) html += row("Age", data.age);
     if (data.tickets) html += row("Tickets", data.tickets);
+    if (data.guests) html += row("Guests", data.guests);
   }
   infoEl.innerHTML = html;
 

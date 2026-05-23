@@ -105,13 +105,72 @@
         <div class="err" id="err-phone">Enter a valid 10-digit number</div>
       </div>
       <div class="field">
-        <label>Number of tickets</label>
-        <select id="ftickets">
-          <option value="1">1 ticket &mdash; &#8377;2,499</option>
-          <option value="2">2 tickets &mdash; &#8377;4,998</option>
-          <option value="3">3 tickets &mdash; &#8377;7,497</option>
-          <option value="4">4 tickets &mdash; &#8377;9,996</option>
+        <label>Ticket type</label>
+        <select id="ftickets" onchange="updateGuestFields()">
+          <option value="1">1 Ticket &mdash; &#8377;2,499</option>
+          <option value="couple">Couple Entry &mdash; &#8377;3,999 (save &#8377;999)</option>
+          <option value="2">2 Tickets &mdash; &#8377;4,998</option>
+          <option value="3">3 Tickets &mdash; &#8377;7,497</option>
+          <option value="4">4 Tickets &mdash; &#8377;9,996</option>
         </select>
+      </div>
+
+      <div id="guest-fields" style="display:none;">
+        <div style="height:1px; background:rgba(201,168,76,0.15); margin-bottom:1.25rem;"></div>
+        <div id="guest-2-wrap">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:1rem;">Guest 2 Details</div>
+          <div class="field">
+            <label>Guest 2 — Full name</label>
+            <input type="text" id="g2name" placeholder="Guest full name" />
+            <div class="err" id="err-g2name">Please enter guest name</div>
+          </div>
+          <div class="field">
+            <label>Guest 2 — Age</label>
+            <input type="number" id="g2age" placeholder="Must be 18+" min="1" max="99" />
+            <div class="err" id="err-g2age">Guest must be 18 or above</div>
+          </div>
+          <div class="field">
+            <label>Guest 2 — Phone</label>
+            <input type="tel" id="g2phone" placeholder="10-digit number" maxlength="10" />
+            <div class="err" id="err-g2phone">Enter a valid 10-digit number</div>
+          </div>
+        </div>
+        <div id="guest-3-wrap" style="display:none;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; margin-top:0.5rem;">Guest 3 Details</div>
+          <div class="field">
+            <label>Guest 3 — Full name</label>
+            <input type="text" id="g3name" placeholder="Guest full name" />
+            <div class="err" id="err-g3name">Please enter guest name</div>
+          </div>
+          <div class="field">
+            <label>Guest 3 — Age</label>
+            <input type="number" id="g3age" placeholder="Must be 18+" min="1" max="99" />
+            <div class="err" id="err-g3age">Guest must be 18 or above</div>
+          </div>
+          <div class="field">
+            <label>Guest 3 — Phone</label>
+            <input type="tel" id="g3phone" placeholder="10-digit number" maxlength="10" />
+            <div class="err" id="err-g3phone">Enter a valid 10-digit number</div>
+          </div>
+        </div>
+        <div id="guest-4-wrap" style="display:none;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; margin-top:0.5rem;">Guest 4 Details</div>
+          <div class="field">
+            <label>Guest 4 — Full name</label>
+            <input type="text" id="g4name" placeholder="Guest full name" />
+            <div class="err" id="err-g4name">Please enter guest name</div>
+          </div>
+          <div class="field">
+            <label>Guest 4 — Age</label>
+            <input type="number" id="g4age" placeholder="Must be 18+" min="1" max="99" />
+            <div class="err" id="err-g4age">Guest must be 18 or above</div>
+          </div>
+          <div class="field">
+            <label>Guest 4 — Phone</label>
+            <input type="tel" id="g4phone" placeholder="10-digit number" maxlength="10" />
+            <div class="err" id="err-g4phone">Enter a valid 10-digit number</div>
+          </div>
+        </div>
       </div>
       <button class="btn" onclick="goToStep2()">Continue &rarr;</button>
     </div>
@@ -220,9 +279,19 @@
 
 <script>
 const UPI = "vanshgupta0004-1@oksbi";
-const PER = 2499;
 const SCRIPT = "https://script.google.com/macros/s/AKfycbw9JPdvo-wQ6gJy2h40MX6A6kFm3DX91G3WcHzIXV8xxakaRB0H7jBcuP08wjcH6W3v/exec";
 let imgs = { selfie: null, aadhaar: null, payment: null };
+
+const PRICES = { "1": 2499, "couple": 3999, "2": 4998, "3": 7497, "4": 9996 };
+const COUNTS = { "1": 1, "couple": 2, "2": 2, "3": 3, "4": 4 };
+
+function updateGuestFields() {
+  const val = document.getElementById("ftickets").value;
+  const count = COUNTS[val];
+  document.getElementById("guest-fields").style.display = count > 1 ? "block" : "none";
+  document.getElementById("guest-3-wrap").style.display = count >= 3 ? "block" : "none";
+  document.getElementById("guest-4-wrap").style.display = count >= 4 ? "block" : "none";
+}
 
 function goToStep1() { showStep(1); }
 
@@ -230,11 +299,46 @@ function goToStep2() {
   const name = document.getElementById("fname").value.trim();
   const age = parseInt(document.getElementById("fage").value);
   const phone = document.getElementById("fphone").value.trim();
+  const val = document.getElementById("ftickets").value;
+  const count = COUNTS[val];
   let ok = true;
-  ["err-name","err-age","err-phone"].forEach(id => document.getElementById(id).style.display = "none");
+
+  ["err-name","err-age","err-phone","err-g2name","err-g2age","err-g2phone","err-g3name","err-g3age","err-g3phone","err-g4name","err-g4age","err-g4phone"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
   if (!name) { document.getElementById("err-name").style.display = "block"; ok = false; }
   if (!age || age < 18) { document.getElementById("err-age").style.display = "block"; ok = false; }
   if (!phone || phone.length !== 10 || isNaN(Number(phone))) { document.getElementById("err-phone").style.display = "block"; ok = false; }
+
+  if (count >= 2) {
+    const g2name = document.getElementById("g2name").value.trim();
+    const g2age = parseInt(document.getElementById("g2age").value);
+    const g2phone = document.getElementById("g2phone").value.trim();
+    if (!g2name) { document.getElementById("err-g2name").style.display = "block"; ok = false; }
+    if (!g2age || g2age < 18) { document.getElementById("err-g2age").style.display = "block"; ok = false; }
+    if (!g2phone || g2phone.length !== 10 || isNaN(Number(g2phone))) { document.getElementById("err-g2phone").style.display = "block"; ok = false; }
+  }
+
+  if (count >= 3) {
+    const g3name = document.getElementById("g3name").value.trim();
+    const g3age = parseInt(document.getElementById("g3age").value);
+    const g3phone = document.getElementById("g3phone").value.trim();
+    if (!g3name) { document.getElementById("err-g3name").style.display = "block"; ok = false; }
+    if (!g3age || g3age < 18) { document.getElementById("err-g3age").style.display = "block"; ok = false; }
+    if (!g3phone || g3phone.length !== 10 || isNaN(Number(g3phone))) { document.getElementById("err-g3phone").style.display = "block"; ok = false; }
+  }
+
+  if (count >= 4) {
+    const g4name = document.getElementById("g4name").value.trim();
+    const g4age = parseInt(document.getElementById("g4age").value);
+    const g4phone = document.getElementById("g4phone").value.trim();
+    if (!g4name) { document.getElementById("err-g4name").style.display = "block"; ok = false; }
+    if (!g4age || g4age < 18) { document.getElementById("err-g4age").style.display = "block"; ok = false; }
+    if (!g4phone || g4phone.length !== 10 || isNaN(Number(g4phone))) { document.getElementById("err-g4phone").style.display = "block"; ok = false; }
+  }
+
   if (!ok) return;
   showStep(2);
 }
@@ -247,11 +351,13 @@ function goToStep3() {
   if (!ok) return;
   const name = document.getElementById("fname").value.trim();
   const phone = document.getElementById("fphone").value.trim();
-  const t = parseInt(document.getElementById("ftickets").value);
-  const total = t * PER;
+  const val = document.getElementById("ftickets").value;
+  const total = PRICES[val];
+  const count = COUNTS[val];
+  const label = val === "couple" ? "Couple Entry" : count + (count===1?" ticket":" tickets");
   document.getElementById("sum-name").textContent = name;
   document.getElementById("sum-phone").textContent = phone;
-  document.getElementById("sum-tickets").textContent = t + (t===1?" ticket":" tickets");
+  document.getElementById("sum-tickets").textContent = label;
   document.getElementById("sum-total").textContent = "\u20b9" + total.toLocaleString("en-IN");
   document.getElementById("upi-amount").textContent = "\u20b9" + total.toLocaleString("en-IN");
   showStep(3);
@@ -268,17 +374,25 @@ async function goToStep4() {
   const name = document.getElementById("fname").value.trim();
   const phone = document.getElementById("fphone").value.trim();
   const age = document.getElementById("fage").value;
-  const t = parseInt(document.getElementById("ftickets").value);
+  const val = document.getElementById("ftickets").value;
+  const count = COUNTS[val];
+  const label = val === "couple" ? "Couple Entry" : count + (count===1?" ticket":" tickets");
   const initials = name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
   const num = Math.floor(1000 + Math.random() * 9000);
   const code = "TMS" + initials + num;
+
+  // Collect guest info
+  let guests = "";
+  if (count >= 2) guests += "G2: " + document.getElementById("g2name").value + " (" + document.getElementById("g2age").value + ") " + document.getElementById("g2phone").value;
+  if (count >= 3) guests += " | G3: " + document.getElementById("g3name").value + " (" + document.getElementById("g3age").value + ") " + document.getElementById("g3phone").value;
+  if (count >= 4) guests += " | G4: " + document.getElementById("g4name").value + " (" + document.getElementById("g4age").value + ") " + document.getElementById("g4phone").value;
 
   // Compress images
   const selfieC = await compressImg(imgs.selfie, 200);
   const aadhaarC = await compressImg(imgs.aadhaar, 200);
   const paymentC = await compressImg(imgs.payment, 200);
 
-  const payload = { code, name, phone, age, tickets: t, selfie: selfieC, aadhaar: aadhaarC, payment: paymentC };
+  const payload = { code, name, phone, age, tickets: label, guests, selfie: selfieC, aadhaar: aadhaarC, payment: paymentC };
 
   try {
     await fetch(SCRIPT, {
@@ -290,7 +404,7 @@ async function goToStep4() {
   document.getElementById("entry-code").textContent = code;
   document.getElementById("conf-name").textContent = name;
   document.getElementById("conf-phone").textContent = phone;
-  document.getElementById("conf-tickets").textContent = t + (t===1?" ticket":" tickets");
+  document.getElementById("conf-tickets").textContent = label;
   document.getElementById("spinner").style.display = "none";
   showStep(4);
 }

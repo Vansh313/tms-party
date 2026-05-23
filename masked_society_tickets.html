@@ -62,6 +62,16 @@
   .code-value { font-family: "Cormorant Garamond", serif; font-size: 36px; font-weight: 300; letter-spacing: 6px; color: var(--gold); }
   .screenshot-note { font-size: 11px; color: var(--muted); text-align: center; letter-spacing: 0.5px; margin-top: 0.75rem; line-height: 1.6; }
   .spinner { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 11px; letter-spacing: 2px; display: none; }
+  .tcard { display:flex; justify-content:space-between; align-items:center; background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:2px; padding:12px 14px; cursor:pointer; transition:all 0.2s; }
+  .tcard:hover { border-color:rgba(201,168,76,0.4); }
+  .tcard.selected { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+  .tcard-special { border-color:rgba(201,168,76,0.3); }
+  .tcard-special.selected { border-color:var(--gold); background:rgba(201,168,76,0.12); }
+  .tcard-name { font-size:13px; color:var(--white); font-weight:400; }
+  .tcard-save { font-size:10px; color:var(--gold); letter-spacing:1px; margin-top:3px; }
+  .tcard-price { font-family:"Cormorant Garamond",serif; font-size:20px; color:var(--gold); font-weight:300; }
+  .soldout-overlay { display:none; position:fixed; inset:0; background:var(--black); z-index:999; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:2rem; }
+  .soldout-overlay.show { display:flex; }
 </style>
 </head>
 <body>
@@ -105,14 +115,31 @@
         <div class="err" id="err-phone">Enter a valid 10-digit number</div>
       </div>
       <div class="field">
-        <label>Ticket type</label>
-        <select id="ftickets" onchange="updateGuestFields()">
-          <option value="1">1 Ticket &mdash; &#8377;2,499</option>
-          <option value="couple">Couple Entry &mdash; &#8377;3,999 (save &#8377;999)</option>
-          <option value="2">2 Tickets &mdash; &#8377;4,998</option>
-          <option value="3">3 Tickets &mdash; &#8377;7,497</option>
-          <option value="4">4 Tickets &mdash; &#8377;9,996</option>
-        </select>
+        <label>Select tickets</label>
+        <div id="ticket-cards" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="tcard" data-val="1" onclick="selectTicket(this)">
+            <div class="tcard-left"><div class="tcard-name">1 Ticket</div></div>
+            <div class="tcard-price">&#8377;2,499</div>
+          </div>
+          <div class="tcard tcard-special" data-val="couple" onclick="selectTicket(this)">
+            <div class="tcard-left"><div class="tcard-name">Couple Entry 💑</div><div class="tcard-save">Save &#8377;999</div></div>
+            <div class="tcard-price">&#8377;3,999</div>
+          </div>
+          <div class="tcard" data-val="2" onclick="selectTicket(this)">
+            <div class="tcard-left"><div class="tcard-name">2 Tickets</div></div>
+            <div class="tcard-price">&#8377;4,998</div>
+          </div>
+          <div class="tcard" data-val="3" onclick="selectTicket(this)">
+            <div class="tcard-left"><div class="tcard-name">3 Tickets</div></div>
+            <div class="tcard-price">&#8377;7,497</div>
+          </div>
+          <div class="tcard" data-val="4" onclick="selectTicket(this)">
+            <div class="tcard-left"><div class="tcard-name">4 Tickets</div></div>
+            <div class="tcard-price">&#8377;9,996</div>
+          </div>
+        </div>
+        <input type="hidden" id="ftickets" value="1" />
+        <div class="err" id="err-ticket">Please select a ticket type</div>
       </div>
 
       <div id="guest-fields" style="display:none;">
@@ -286,7 +313,24 @@
   </div>
 </div>
 
+<!-- SOLD OUT OVERLAY -->
+<div class="soldout-overlay" id="soldout-overlay">
+  <div style="font-family:'Cormorant Garamond',serif; font-size:48px; color:var(--gold); margin-bottom:1rem;">&#128274;</div>
+  <div style="font-family:'Cormorant Garamond',serif; font-size:32px; letter-spacing:4px; color:var(--white); margin-bottom:1rem;">SOLD OUT</div>
+  <div style="font-size:12px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; line-height:1.8;">All seats have been claimed.<br>Follow us for the next event.</div>
+  <div style="margin-top:2rem; font-size:11px; color:var(--muted);">@themasked.society</div>
+</div>
+
 <script>
+// ========= SOLD OUT TOGGLE =========
+// Change to true to activate sold out mode
+const SOLD_OUT = false;
+// ====================================
+
+if (SOLD_OUT) {
+  document.getElementById("soldout-overlay").classList.add("show");
+}
+
 const UPI = "vanshgupta0004-1@oksbi";
 const SCRIPT = "https://script.google.com/macros/s/AKfycbw9JPdvo-wQ6gJy2h40MX6A6kFm3DX91G3WcHzIXV8xxakaRB0H7jBcuP08wjcH6W3v/exec";
 let imgs = { selfie: null, aadhaar: null, payment: null };
@@ -445,6 +489,20 @@ function handleUpload(input, previewId, doneId, key) {
     document.getElementById(doneId).style.display = "block";
   };
   reader.readAsDataURL(file);
+}
+
+// Select first ticket card by default
+window.addEventListener("load", function() {
+  const first = document.querySelector(".tcard");
+  if (first) { first.classList.add("selected"); }
+  if (SOLD_OUT) document.getElementById("soldout-overlay").classList.add("show");
+});
+
+function selectTicket(el) {
+  document.querySelectorAll(".tcard").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("ftickets").value = el.dataset.val;
+  updateGuestFields();
 }
 
 window.ageConfirmed = false;

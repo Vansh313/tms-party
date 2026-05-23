@@ -173,11 +173,11 @@
         </div>
       </div>
       <div class="field" style="margin-top:0.5rem;">
-        <div style="background:rgba(201,168,76,0.06); border:0.5px solid rgba(201,168,76,0.2); border-radius:2px; padding:12px 14px;">
-          <div style="display:flex; align-items:flex-start; gap:12px;">
-            <input type="checkbox" id="age-confirm" style="width:20px; height:20px; margin-top:1px; accent-color:#C9A84C; flex-shrink:0; cursor:pointer; border:1px solid #C9A84C;" />
-            <span style="font-size:11px; color:#888880; line-height:1.7;">I confirm that all guests in my booking are <strong style="color:#E8C97A;">18 years of age or above</strong>. I take full responsibility for my guests. False information may result in denial of entry without refund.</span>
+        <div id="confirm-box" onclick="toggleConfirm()" style="background:rgba(201,168,76,0.06); border:0.5px solid rgba(201,168,76,0.2); border-radius:2px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:12px;">
+          <div id="custom-check" style="width:20px; height:20px; min-width:20px; border:1.5px solid #C9A84C; border-radius:3px; display:flex; align-items:center; justify-content:center; margin-top:1px; transition:background 0.2s;">
+            <span id="check-tick" style="color:#000; font-size:14px; font-weight:700; display:none;">&#10003;</span>
           </div>
+          <span style="font-size:11px; color:#888880; line-height:1.7;">I confirm that all guests in my booking are <strong style="color:#E8C97A;">18 years of age or above</strong>. I take full responsibility for my guests. False information may result in denial of entry without refund.</span>
         </div>
         <div class="err" id="err-confirm">You must confirm all guests are 18+ to proceed</div>
       </div>
@@ -320,7 +320,7 @@ function goToStep2() {
   if (!name) { document.getElementById("err-name").style.display = "block"; ok = false; }
   if (!age || age < 18) { document.getElementById("err-age").style.display = "block"; ok = false; }
   if (!phone || phone.length !== 10 || isNaN(Number(phone))) { document.getElementById("err-phone").style.display = "block"; ok = false; }
-  if (!document.getElementById("age-confirm").checked) { document.getElementById("err-confirm").style.display = "block"; ok = false; }
+  if (!window.ageConfirmed) { document.getElementById("err-confirm").style.display = "block"; ok = false; }
 
   if (count >= 2) {
     const g2name = document.getElementById("g2name").value.trim();
@@ -445,6 +445,22 @@ function handleUpload(input, previewId, doneId, key) {
     document.getElementById(doneId).style.display = "block";
   };
   reader.readAsDataURL(file);
+}
+
+window.ageConfirmed = false;
+
+function toggleConfirm() {
+  window.ageConfirmed = !window.ageConfirmed;
+  const box = document.getElementById("custom-check");
+  const tick = document.getElementById("check-tick");
+  if (window.ageConfirmed) {
+    box.style.background = "#C9A84C";
+    tick.style.display = "block";
+    document.getElementById("err-confirm").style.display = "none";
+  } else {
+    box.style.background = "transparent";
+    tick.style.display = "none";
+  }
 }
 
 function showStep(n) {

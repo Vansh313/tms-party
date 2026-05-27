@@ -208,13 +208,24 @@
         </div>
         <div class="err" id="err-confirm">You must confirm all guests are 18+ to proceed</div>
       </div>
+
+      <div class="field" style="margin-top:0.5rem;">
+        <div id="rules-box" onclick="toggleRules()" style="background:rgba(201,168,76,0.06); border:0.5px solid rgba(201,168,76,0.2); border-radius:2px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:12px;">
+          <div id="rules-check" style="width:20px; height:20px; min-width:20px; border:1.5px solid #C9A84C; border-radius:3px; display:flex; align-items:center; justify-content:center; margin-top:1px; transition:background 0.2s;">
+            <span id="rules-tick" style="color:#000; font-size:14px; font-weight:700; display:none;">&#10003;</span>
+          </div>
+          <span style="font-size:11px; color:#888880; line-height:1.7;">I agree that any <strong style="color:#E8C97A;">damage to property</strong> will be charged to me. I also understand that <strong style="color:#E8C97A;">re-entry is not allowed</strong> once I exit the venue.</span>
+        </div>
+        <div class="err" id="err-rules">You must agree to venue rules to proceed</div>
+      </div>
+
       <button class="btn" onclick="goToStep2()">Continue &rarr;</button>
     </div>
     <div class="includes-grid">
       <div class="inc-item"><span>&#9670;</span> DJ Night</div>
       <div class="inc-item"><span>&#9670;</span> Swimming Pool</div>
       <div class="inc-item"><span>&#9670;</span> Unlimited Food</div>
-      <div class="inc-item"><span>&#9670;</span> Open Bar</div>
+      <div class="inc-item"><span>&#9670;</span> Welcome Drinks</div>
       <div class="inc-item"><span>&#9670;</span> Games</div>
       <div class="inc-item"><span>&#9670;</span> Live Anchor</div>
     </div>
@@ -307,6 +318,7 @@
         <div class="summary-row"><span class="lbl">Name</span><span class="val" id="conf-name">&mdash;</span></div>
         <div class="summary-row"><span class="lbl">Phone</span><span class="val" id="conf-phone">&mdash;</span></div>
         <div class="summary-row"><span class="lbl">Tickets</span><span class="val" id="conf-tickets">&mdash;</span></div>
+        <div class="summary-row"><span class="lbl">Drinks</span><span class="val" style="font-size:11px;">3 Whisky + 2 Vodka + 1 Beer</span></div>
         <div class="summary-row"><span class="lbl">Venue</span><span class="val" style="color:var(--muted)">Dropping 1 June</span></div>
       </div>
     </div>
@@ -356,7 +368,7 @@ function goToStep2() {
   const count = COUNTS[val];
   let ok = true;
 
-  ["err-name","err-age","err-phone","err-confirm","err-g2name","err-g2age","err-g2phone","err-g3name","err-g3age","err-g3phone","err-g4name","err-g4age","err-g4phone"].forEach(id => {
+  ["err-name","err-age","err-phone","err-confirm","err-rules","err-g2name","err-g2age","err-g2phone","err-g3name","err-g3age","err-g3phone","err-g4name","err-g4age","err-g4phone"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
@@ -365,6 +377,7 @@ function goToStep2() {
   if (!age || age < 18) { document.getElementById("err-age").style.display = "block"; ok = false; }
   if (!phone || phone.length !== 10 || isNaN(Number(phone))) { document.getElementById("err-phone").style.display = "block"; ok = false; }
   if (!window.ageConfirmed) { document.getElementById("err-confirm").style.display = "block"; ok = false; }
+  if (!window.rulesConfirmed) { document.getElementById("err-rules").style.display = "block"; ok = false; }
 
   if (count >= 2) {
     const g2name = document.getElementById("g2name").value.trim();
@@ -506,6 +519,21 @@ function selectTicket(el) {
 }
 
 window.ageConfirmed = false;
+window.rulesConfirmed = false;
+
+function toggleRules() {
+  window.rulesConfirmed = !window.rulesConfirmed;
+  const box = document.getElementById("rules-check");
+  const tick = document.getElementById("rules-tick");
+  if (window.rulesConfirmed) {
+    box.style.background = "#C9A84C";
+    tick.style.display = "block";
+    document.getElementById("err-rules").style.display = "none";
+  } else {
+    box.style.background = "transparent";
+    tick.style.display = "none";
+  }
+}
 
 function toggleConfirm() {
   window.ageConfirmed = !window.ageConfirmed;

@@ -10,7 +10,7 @@
   :root { --gold: #C9A84C; --gold-light: #E8C97A; --black: #0A0A0A; --dark2: #1A1A1A; --dark3: #222222; --white: #F5F0E8; --muted: #888880; --border: rgba(201,168,76,0.2); }
   html, body { min-height: 100vh; background: var(--black); color: var(--white); font-family: "Montserrat", sans-serif; font-weight: 300; }
   body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 60%); pointer-events: none; z-index: 0; }
-  .container { max-width: 480px; margin: 0 auto; padding: 2rem 1.25rem 4rem; position: relative; z-index: 1; }
+  .container { max-width: 480px; margin: 0 auto; padding: 2rem 1.25rem 4rem; padding-top: 3.5rem; position: relative; z-index: 1; }
   .header { text-align: center; padding: 2rem 0 2.5rem; }
   .logo-wrap { width: 80px; height: 80px; margin: 0 auto 1.5rem; border-radius: 50%; border: 1px solid var(--border); overflow: hidden; background: var(--dark2); }
   .logo-wrap img { width: 80px; height: 80px; object-fit: cover; }
@@ -72,6 +72,15 @@
   .tcard-price { font-family:"Cormorant Garamond",serif; font-size:20px; color:var(--gold); font-weight:300; }
   .soldout-overlay { display:none; position:fixed; inset:0; background:var(--black); z-index:999; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:2rem; }
   .soldout-overlay.show { display:flex; }
+  .ticker-wrap { position:fixed; top:0; left:0; right:0; background:var(--gold); z-index:998; overflow:hidden; height:32px; display:flex; align-items:center; }
+  .ticker-text { white-space:nowrap; animation:ticker 18s linear infinite; font-size:11px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--black); padding-left:100%; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+  .popup-notif { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:var(--dark2); border:0.5px solid var(--gold); border-radius:2px; padding:12px 20px; display:flex; align-items:center; gap:12px; z-index:997; box-shadow:0 4px 20px rgba(0,0,0,0.5); opacity:0; transition:opacity 0.4s; pointer-events:none; min-width:280px; }
+  .popup-notif.show { opacity:1; }
+  .popup-dot { width:8px; height:8px; background:var(--gold); border-radius:50%; flex-shrink:0; animation:pulse 1.5s ease infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  .popup-text { font-size:12px; color:var(--white); letter-spacing:0.5px; }
+  .popup-text span { color:var(--gold); font-weight:500; }
 </style>
 </head>
 <body>
@@ -309,7 +318,7 @@
         <div class="code-label">Your entry code</div>
         <div class="code-value" id="entry-code">&mdash;</div>
       </div>
-      <div class="screenshot-note">&#128247; Screenshot your entry code and save it.<br>Show it at the gate on 12 June.<br>Venue dropping 1 June for ticket holders.</div>
+      <div class="screenshot-note">&#128247; Screenshot your entry code and save it.<br>Show it at the gate on 12 June.<br>Venue dropped! Check our Instagram @themasked.society 🔒</div>
       <div style="margin-top:1rem; background:rgba(201,168,76,0.06); border:0.5px solid rgba(201,168,76,0.3); border-radius:2px; padding:12px 14px; font-size:12px; color:var(--gold-light); text-align:center; letter-spacing:1px;">
         &#9888; Please carry a valid physical ID to the event
       </div>
@@ -318,11 +327,22 @@
         <div class="summary-row"><span class="lbl">Name</span><span class="val" id="conf-name">&mdash;</span></div>
         <div class="summary-row"><span class="lbl">Phone</span><span class="val" id="conf-phone">&mdash;</span></div>
         <div class="summary-row"><span class="lbl">Tickets</span><span class="val" id="conf-tickets">&mdash;</span></div>
-        <div class="summary-row"><span class="lbl">Drinks</span><span class="val" style="font-size:11px;">3 Whisky Serving + 2 Vodka Serving + 1 Beer</span></div>
-        <div class="summary-row"><span class="lbl">Venue</span><span class="val" style="color:var(--muted)">Dropping 1 June</span></div>
+        <div class="summary-row"><span class="lbl">Drinks</span><span class="val" style="font-size:11px;">3 Whisky Servings + 2 Vodka Servings + 1 Beer</span></div>
+        <div class="summary-row"><span class="lbl">Venue</span><span class="val" style="color:var(--muted)">Check our Instagram</span></div>
       </div>
     </div>
   </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-text">🎭 BOLLYWOOD TECHNO NIGHT &nbsp;&nbsp;·&nbsp;&nbsp; 12 JUNE · KARNAL &nbsp;&nbsp;·&nbsp;&nbsp; BOOK NOW — LIMITED SEATS AVAILABLE &nbsp;&nbsp;·&nbsp;&nbsp; DJ · POOL · WELCOME DRINKS · 5 STARTERS &nbsp;&nbsp;·&nbsp;&nbsp; 🎭 BOLLYWOOD TECHNO NIGHT &nbsp;&nbsp;·&nbsp;&nbsp; 12 JUNE · KARNAL &nbsp;&nbsp;·&nbsp;&nbsp; BOOK NOW — LIMITED SEATS AVAILABLE &nbsp;&nbsp;·&nbsp;&nbsp; DJ · POOL · WELCOME DRINKS · 5 STARTERS &nbsp;&nbsp;·&nbsp;&nbsp;</div>
+</div>
+
+<!-- POPUP NOTIFICATION -->
+<div class="popup-notif" id="popup-notif">
+  <div class="popup-dot"></div>
+  <div class="popup-text"><span id="popup-name">Someone</span> just booked a spot 🔒</div>
 </div>
 
 <!-- SOLD OUT OVERLAY -->
@@ -569,6 +589,37 @@ function copyUPI() {
     setTimeout(() => { b.textContent = "Copy UPI ID"; b.style.color = ""; }, 2000);
   });
 }
+
+// Fake booking popup notifications
+const fakeNames = [
+  "Arjun S.", "Priya M.", "Rahul K.", "Sneha T.", "Vikram D.",
+  "Ananya R.", "Karan P.", "Nisha G.", "Rohan B.", "Simran J.",
+  "Aditya V.", "Pooja S.", "Manish K.", "Divya M.", "Sahil A.",
+  "Riya C.", "Nikhil T.", "Shreya P.", "Gaurav S.", "Tanya B."
+];
+
+function showPopup() {
+  const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+  const popup = document.getElementById("popup-notif");
+  document.getElementById("popup-name").textContent = name;
+  popup.classList.add("show");
+  setTimeout(() => { popup.classList.remove("show"); }, 3500);
+}
+
+// Show popup every 25-45 seconds
+function schedulePopup() {
+  const delay = Math.floor(Math.random() * 20000) + 25000;
+  setTimeout(() => {
+    showPopup();
+    schedulePopup();
+  }, delay);
+}
+
+// First popup after 8 seconds
+setTimeout(() => {
+  showPopup();
+  schedulePopup();
+}, 8000);
 </script>
 </body>
 </html>

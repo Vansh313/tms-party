@@ -276,7 +276,7 @@
       <div class="card-title">Pay via UPI</div>
       <div class="upi-box">
         <div class="upi-label">Send exact amount to</div>
-        <div class="upi-id-text">vanshgupta0004-1@oksbi</div>
+        <div class="upi-id-text" id="upi-id-display">vanshgupta0004-1@oksbi</div>
         <button class="copy-btn" onclick="copyUPI()">Copy UPI ID</button>
         <div class="amount-big" id="upi-amount">&#8377;2,499</div>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:1px;">EXACT AMOUNT ONLY</div>
@@ -343,7 +343,10 @@ if (SOLD_OUT) {
   document.getElementById("soldout-overlay").classList.add("show");
 }
 
-const UPI = "vanshgupta0004-1@oksbi";
+// UPI rotation every 5 bookings
+const UPI_IDS = ["vanshgupta0004-1@oksbi", "9467204799@ptaxis"];
+const bookingCount = parseInt(localStorage.getItem("tms_booking_count") || "0");
+const UPI = UPI_IDS[Math.floor(bookingCount / 5) % 2];
 const SCRIPT = "https://script.google.com/macros/s/AKfycbw9JPdvo-wQ6gJy2h40MX6A6kFm3DX91G3WcHzIXV8xxakaRB0H7jBcuP08wjcH6W3v/exec";
 let imgs = { selfie: null, aadhaar: null, payment: null };
 
@@ -427,6 +430,7 @@ function goToStep3() {
   document.getElementById("sum-tickets").textContent = label;
   document.getElementById("sum-total").textContent = "\u20b9" + total.toLocaleString("en-IN");
   document.getElementById("upi-amount").textContent = "\u20b9" + total.toLocaleString("en-IN");
+  document.getElementById("upi-id-display").textContent = UPI;
   showStep(3);
 }
 
@@ -466,6 +470,8 @@ async function goToStep4() {
       method: "POST",
       body: JSON.stringify(payload)
     });
+    // Increment booking counter for UPI rotation
+    localStorage.setItem("tms_booking_count", bookingCount + 1);
   } catch(e) {}
 
   document.getElementById("entry-code").textContent = code;
@@ -557,7 +563,7 @@ function showStep(n) {
 }
 
 function copyUPI() {
-  navigator.clipboard.writeText(UPI).then(() => {
+  navigator.clipboard.writeText(document.getElementById("upi-id-display").textContent).then(() => {
     const b = document.querySelector(".copy-btn");
     b.textContent = "Copied!"; b.style.color = "var(--gold)";
     setTimeout(() => { b.textContent = "Copy UPI ID"; b.style.color = ""; }, 2000);
